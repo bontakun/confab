@@ -1,9 +1,32 @@
 <html>
 <head>
+
+  <!-- 3rd party libs -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/backbone-min.js"></script>
+  <script src="/js/underscore.js"></script>
+  <script src="/js/backbone.js"></script>
+
+  <!-- Confab libs -->
+  <script src="/js/utilities.js"></script>
+
+  <!-- Confab app -->
+  <script src="/js/models.js"></script>
+  <script src="/js/views.js"></script>
+  <script src="/js/collections.js"></script>
+  <script src="/js/controllers.js"></script>
+
 </head>
 <body>
-  {{{yield}}}
+
+  <header>
+  </header>
+
+  <nav>
+  </nav>
+
+  <section id="content">
+    {{yield}}
+  </section>
+
 </body>
 </html>
