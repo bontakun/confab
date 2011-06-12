@@ -4,7 +4,8 @@
   , "private": true
   , "dependencies": {
       "express": "2.3.11"
-    , "stache": ">= 0.0.3"
-    , "socket.io": ">= 0.6.18"
+    , "stache": "0.0.3"
+    , "socket.io": "0.6.18"
+    , "backbone": "0.3.2"
   }
 }
