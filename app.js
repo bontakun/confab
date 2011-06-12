@@ -4,6 +4,7 @@
  */
 
 var express = require('express');
+var io = require('socket.io');
 
 var app = module.exports = express.createServer();
 
@@ -37,3 +38,5 @@ app.get('/', function(req, res){
 
 app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);
+
+var socket = io.listen(app);
