@@ -1,5 +1,6 @@
 confab.views = {};
 
+/*
 confab.views.MessageView = Backbone.View.extend({
   render: function() {
     // TODO: Add mustache to the client side
@@ -9,4 +10,4 @@ confab.views.MessageView = Backbone.View.extend({
     return this;
   }
 });
-
+*/

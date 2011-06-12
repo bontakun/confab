@@ -1,5 +1,4 @@
 confab.models = {};
 
-confab.models.Message = Backbone.Model.extend({});
-
-confab.models.User = Backbone.Model.extend({});
+// Create the Message model.
+confab.models.Message = Spine.Model.setup("Message", ["user", "text"]);

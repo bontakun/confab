@@ -1,14 +1,9 @@
 confab.controllers = {};
 
-confab.controllers.Main = Backbone.Controller.extend({
-  routes: {
-    "*actions": "defaultRoute" // matches http://example.com/#anything-here
-  },
-  defaultRoute: function(actions) {
-    alert(actions);
-  }
+confab.controllers.Application = Spine.Controller.create({
+  init: function() {}
 });
 
-// Start the app
-confab.app = new confab.controllers.Main;
-Backbone.history.start();
+confab.controllers.Messages = Spine.Controller.create({
+  init: function() {}
+});
