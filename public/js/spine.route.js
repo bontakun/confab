@@ -1,1 +1,0 @@
-../../node_modules/spine/lib/spine.route.js

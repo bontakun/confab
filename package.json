@@ -6,6 +6,7 @@
       "express": "2.3.11"
     , "stache": "0.0.3"
     , "socket.io": "0.6.18"
-    , "spine": "0.0.5"
+    , "backbone": "0.3.2"
+    , "underscore": "1.1.6"
   }
 }
