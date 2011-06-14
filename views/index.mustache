@@ -1,1 +1,36 @@
-Hello
+<div id="chat-container">
+</div>
+<input id="input" type="textbox" />
+
+<script type="text/javascript">
+
+(function () {
+  var socket = new io.Socket(null);
+  socket.connect();
+
+  var container = $('#chat-container');
+
+  $('#input').bind('keypress', function(e) {
+    if (e.keyCode === 13) {
+      container.append($('<p>').text(this.value));
+      socket.send(this.value);
+      this.value = '';
+    }
+  });
+
+  socket.on('connect', function () {
+    container.append($('<p>').text('connected'));
+  });
+
+  socket.on('message', function (message) {
+    console.log('message');
+    container.append($('<p>').text(message));
+  });
+
+  socket.on('disconnect', function () {
+    container.append($('<p>').text('disconnected'));
+  });
+
+})();
+
+</script>

@@ -4,7 +4,7 @@
  */
 
 var express = require('express');
-var io = require('socket.io');
+var sio = require('socket.io');
 
 var app = module.exports = express.createServer();
 
@@ -31,10 +31,32 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', function(req, res){
-  res.render('index', {});
+  res.render('index', {
+    locals: {
+      node_server_url: 'http://localhost:3000'
+    }
+  });
 });
 
 app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);
 
-var socket = io.listen(app);
+var socket = sio.listen(app);
+var buffer = [];
+
+socket.on('connection', function(client) {
+  client.send({ buffer: buffer });
+  client.broadcast({ announcement: client.sessionId + ' connected' });
+
+  client.on('message', function(message) {
+    console.log('message');
+    var msg = { message: [client.sessionId, message] };
+    buffer.push(msg);
+    if (buffer.length > 15) buffer.shift();
+    client.broadcast(msg);
+  });
+
+  client.on('disconnect', function() {
+    client.broadcast({ announcement: client.sessionId + ' disconnected' });
+  });
+});
