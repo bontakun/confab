@@ -1,5 +1,15 @@
 confab.models = {};
 
-confab.models.Message = Backbone.Model.extend({});
+confab.models.Message = Backbone.Model.extend({
+  EMPTY: "empty message...",
 
-confab.models.User = Backbone.Model.extend({});
+  initialize: function() {
+    if (!this.get("text")) {
+      this.set({"text": this.EMPTY});
+    }
+  },
+
+  sync: function() {
+    // Noop
+  }
+});
