@@ -1,36 +1,116 @@
+<style>
+html, body {
+  font-family: verdana;
+  font-size: 12px;
+  line-height: 16px;
+}
+#chat-container {
+  width: 800px;
+  margin: 20 auto;
+  border: 1px dashed #ddd;
+}
+
+#chat-input {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+#chat-input input {
+  font-family: verdana;
+  font-size: 12px;
+}
+
+#chat-input #name {
+  width: 50px;
+}
+
+#chat-input #input {
+  width: 720px;
+}
+
+#chat-console {
+  min-height: 100px;
+  padding: 10px;
+}
+
+#chat-console p {
+  margin: 0;
+  padding: 4px 0;
+}
+</style>
+
 <div id="chat-container">
+  <div id="chat-input">
+    <input id="name" type="textbox" value="name" />
+    <input id="input" type="textbox" value="message" />
+  </div>
+  <div id="chat-console">
+  </div>
 </div>
-<input id="input" type="textbox" />
 
 <script type="text/javascript">
 
-(function () {
+(function (global) {
   var socket = new io.Socket(null);
   socket.connect();
 
-  var container = $('#chat-container');
+
+
+  $('#name').click(function (e) {
+    this.value = '';
+  });
+
+  $('#name').bind('keypress blur', function(e) {
+    if (global.connected && (e.keyCode === 13 || e.type === 'blur')) {
+      global.name = this.value;
+      $(this).attr("disabled", "disabled");
+      socket.send({connect: {name: global.name}});
+      $('#input').focus();
+    }
+  });
+
+  $('#input').bind('focus', function(e) {
+    if (this.value === 'message')
+      this.value = '';
+  });
 
   $('#input').bind('keypress', function(e) {
-    if (e.keyCode === 13) {
-      container.append($('<p>').text(this.value));
+    if (e.keyCode === 13 && global.connected) {
+      addMessage(global.name + ": " + this.value);
       socket.send(this.value);
       this.value = '';
     }
   });
 
+  var container = $('#chat-console');
+  function addMessage(message) {
+    var message = $('<p>').text(message);
+    container.prepend(message);
+    message.effect("highlight", {}, 1500);
+  };
+
   socket.on('connect', function () {
-    container.append($('<p>').text('connected'));
+    global.connected = true;
   });
 
-  socket.on('message', function (message) {
-    console.log('message');
-    container.append($('<p>').text(message));
+  socket.on('message', function (data) {
+    if (data.buffer) {
+      for (var i = 0; i < data.buffer.length; i++) {
+        var bufferItem = data.buffer[i];
+        if (bufferItem) {
+          addMessage(bufferItem.name + ": " + bufferItem.message);
+        }
+      }
+    } else {
+      addMessage(data.name + ": " + data.message);
+    }
   });
 
   socket.on('disconnect', function () {
-    container.append($('<p>').text('disconnected'));
+    addMessage('disconnected');
+    global.connected = false;
   });
 
-})();
+})({});
 
 </script>

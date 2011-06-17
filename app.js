@@ -43,20 +43,33 @@ console.log("Express server listening on port %d", app.address().port);
 
 var socket = sio.listen(app);
 var buffer = [];
+var clients = {};
 
 socket.on('connection', function(client) {
-  client.send({ buffer: buffer });
-  client.broadcast({ announcement: client.sessionId + ' connected' });
+  client.send(buffer);
 
   client.on('message', function(message) {
-    console.log('message');
-    var msg = { message: [client.sessionId, message] };
+    if (message.connect) {
+      clients[client.sessionId] = message.connect.name;
+      message = "connected"
+    }
+
+    var msg = {
+      name: clients[client.sessionId],
+      message: message
+    };
+
     buffer.push(msg);
     if (buffer.length > 15) buffer.shift();
     client.broadcast(msg);
   });
 
   client.on('disconnect', function() {
-    client.broadcast({ announcement: client.sessionId + ' disconnected' });
+    if (clients[client.sessionId]) {
+      client.broadcast({
+        name: clients[client.sessionId],
+        message: "disconnected"
+      });
+    }
   });
 });
