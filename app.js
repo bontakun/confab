@@ -33,12 +33,12 @@ app.configure('production', function(){
 app.get('/', function(req, res){
   res.render('index', {
     locals: {
-      node_server_url: 'http://localhost:3000'
+      node_server_url: 'http://confab.jipsta.com'
     }
   });
 });
 
-app.listen(3000);
+app.listen(35711);
 console.log("Express server listening on port %d", app.address().port);
 
 var socket = sio.listen(app);
@@ -46,7 +46,10 @@ var buffer = [];
 var clients = {};
 
 socket.on('connection', function(client) {
-  client.send(buffer);
+  
+  if (buffer.length > 0) {
+    client.send({buffer: buffer});
+  }
 
   client.on('message', function(message) {
     if (message.connect) {
