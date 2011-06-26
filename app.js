@@ -1,15 +1,14 @@
-
 /**
  * Module dependencies.
  */
-
 var express = require('express');
 var sio = require('socket.io');
+var util = require('util');
+var irc = require('irc');
 
 var app = module.exports = express.createServer();
 
 // Configuration
-
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'mustache');
@@ -42,37 +41,43 @@ app.listen(35711);
 console.log("Express server listening on port %d", app.address().port);
 
 var socket = sio.listen(app);
-var buffer = [];
 var clients = {};
 
-socket.on('connection', function(client) {
+socket.sockets.on('connection', function(client) {
   
-  if (buffer.length > 0) {
-    client.send({buffer: buffer});
-  }
-
   client.on('message', function(message) {
-    if (message.connect) {
-      clients[client.sessionId] = message.connect.name;
-      message = "connected"
+    console.log('message: %s', util.inspect(message));
+    if (message.connect && message.connect.name) {
+      connect(client, client.id, message.connect.name);
+    } else if (!message.connect) {
+      if (clients[client.id])
+        clients[client.id].proxy.say('#public', message);
     }
-
-    var msg = {
-      name: clients[client.sessionId],
-      message: message
-    };
-
-    buffer.push(msg);
-    if (buffer.length > 15) buffer.shift();
-    client.broadcast(msg);
   });
 
   client.on('disconnect', function() {
-    if (clients[client.sessionId]) {
-      client.broadcast({
-        name: clients[client.sessionId],
-        message: "disconnected"
-      });
-    }
+    console.log('disconnecting');
+    disconnect(client.id);
   });
 });
+
+function connect(client, sessionId, nickname) {
+  clients[sessionId] = { name: nickname };
+  var proxy = new irc.Client('irc.gatewayy.net', nickname, {
+    port: 6697, secure: true,
+    debug: true, showErrors: true,
+    channels: ['#public']
+  });
+
+  proxy.addListener('message', function (from, to, msg) {
+    client.json.send({ name: from, message: msg });
+  });
+  clients[sessionId].proxy = proxy;
+}
+
+function disconnect(client, sessionId) {
+  if (clients[sessionId]) {
+      client.json.send({ name: clients[sessionId].name, message: "disconnected" });
+      clients[sessionId].proxy.disconnect("disconnected");
+    }
+}
