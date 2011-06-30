@@ -1,13 +1,14 @@
 <style>
-html, body {
+html, body, input {
   font-family: verdana;
   font-size: 12px;
   line-height: 16px;
 }
+
 #chat-container {
   width: 800px;
   margin: 20 auto;
-  border: 1px dashed #ddd;
+  border: 1px solid #ddd;
 }
 
 #chat-input {
@@ -15,34 +16,95 @@ html, body {
   border-bottom: 1px solid #ddd;
 }
 
-#chat-input input {
-  font-family: verdana;
-  font-size: 12px;
-}
-
-#chat-input #name {
-  width: 50px;
-}
-
 #chat-input #input {
-  width: 720px;
+  width: 780px;
 }
 
 #chat-console {
   min-height: 100px;
   padding: 10px;
+  background: #fcfcfc;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fcfcfc), to(#efefef));
+  background: -moz-linear-gradient(top, #fcfcfc, #efefef);
+  background: linear-gradient(top, #fcfcfc, #efefef);
+  color: #373737;
+  text-shadow: 0 1px 1px #ffffff;
 }
 
 #chat-console p {
   margin: 0;
-  padding: 4px 0;
+  padding: 4px 4px;
+  
+  border-bottom: 1px solid #cdcdcc;
+  -moz-box-shadow: 0 1px 1px #fcfcfc;
+  -webkit-box-shadow: 0 1px 1px #fcfcfc;
+  box-shadow: 0 1px 1px #fcfcfc;
 }
+
+#chat-console span.sender {
+  width: 90px;
+  text-overflow: ellipsis;
+  padding-right: 2px;
+}
+
+#chat-console span.message {
+  padding-left: 2px;
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+#chat-console p:last-child {
+  border-bottom: 0px solid #cdcdcc;
+}
+
+#dashboard {
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  
+  z-index: 500;
+  
+  background-color: black;
+  opacity: 0.4;
+}
+
+#loginBox {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  
+  width: 200px;
+  margin-left: -100px;
+  padding: 10px;
+  
+  z-index: 520;  
+  background-color: white;
+  border: 1px solid #ddd;
+}
+
+#loginBox input {
+  width: 100%;
+}
+
+.hidden {
+  display: none;
+}
+
 </style>
+
+
+<div id="dashboard"></div>
+<div id="loginBox">
+  Login to Confab
+  <input id="name" type="text" placeholder="name" />
+  <input id="room" type="text" placeholder="roomname" value="#botwars" />
+  <input id="login" type="button" value="Login"/>
+</div>
 
 <div id="chat-container">
   <div id="chat-input">
-    <input id="name" type="textbox" value="name" />
-    <input id="input" type="textbox" value="message" />
+    <input id="input" type="textbox" placeholder="message" />
   </div>
   <div id="chat-console">
   </div>
@@ -52,39 +114,27 @@ html, body {
 
 (function (global) {
   var socket = io.connect();
+  var container = $('#chat-console');
 
-  $('#name').click(function (e) {
-    this.value = '';
-  });
-
-  $('#name').bind('keypress blur', function(e) {
-    if (global.connected && (e.keyCode === 13 || e.type === 'blur') && $(this).attr("disabled") != "disabled") {
-      global.name = this.value;
-      $(this).attr("disabled", "disabled");
-      socket.json.send({connect: {name: global.name}});
+  $('#login').click(function(e) {
+    if(global.connected) {
+      global.name = $('#name').val();
+      global.channel = $('#room').val();
+      
+      $('#dashboard').addClass("hidden");
+      $('#loginBox').addClass("hidden");
+      socket.json.send({connect: {name: global.name, channel: global.channel}});
       $('#input').focus();
     }
   });
 
-  $('#input').bind('focus', function(e) {
-    if (this.value === 'message')
-      this.value = '';
-  });
-
   $('#input').bind('keypress', function(e) {
-    if (e.keyCode === 13 && global.connected) {
-      addMessage(global.name + ": " + this.value);
+    if(e.keyCode === 13 && global.connected) {
+      addMessage(global.name, this.value);
       socket.json.send(this.value);
       this.value = '';
     }
   });
-
-  var container = $('#chat-console');
-  function addMessage(message) {
-    var message = $('<p>').text(message);
-    container.prepend(message);
-    message.effect("highlight", {}, 1500);
-  };
 
   socket.on('connect', function () {
     global.connected = true;
@@ -95,11 +145,11 @@ html, body {
       for (var i = 0; i < data.buffer.length; i++) {
         var bufferItem = data.buffer[i];
         if (bufferItem) {
-          addMessage(bufferItem.name + ": " + bufferItem.message);
+          addMessage(bufferItem.name, bufferItem.message);
         }
       }
     } else {
-      addMessage(data.name + ": " + data.message);
+      addMessage(data.name, data.message);
     }
   });
 
@@ -107,6 +157,20 @@ html, body {
     global.connected = false;
   });
 
+  function addMessage(from, message) {
+    var messageContainer = $('<p>');
+    
+    var sender = $('<span>').text(from);
+    sender.addClass('sender');
+    messageContainer.append(sender);
+    
+    var content = $('<span>').text(message);
+    content.addClass('message');
+    messageContainer.append(content);
+    
+    container.prepend(messageContainer);
+    messageContainer.effect("highlight", {}, 1500);
+  };
 })({});
 
 </script>

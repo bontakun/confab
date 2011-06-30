@@ -48,7 +48,8 @@ socket.sockets.on('connection', function(client) {
   client.on('message', function(message) {
     console.log('message: %s', util.inspect(message));
     if (message.connect && message.connect.name) {
-      connect(client, client.id, message.connect.name);
+      connect(client, client.id, message.connect.name, message.connect.channel);
+      
     } else if (!message.connect) {
       if (clients[client.id])
         clients[client.id].proxy.say('#public', message);
@@ -61,12 +62,12 @@ socket.sockets.on('connection', function(client) {
   });
 });
 
-function connect(client, sessionId, nickname) {
+function connect(client, sessionId, nickname, channel) {
   clients[sessionId] = { name: nickname };
   var proxy = new irc.Client('irc.gatewayy.net', nickname, {
     port: 6697, secure: true,
     debug: true, showErrors: true,
-    channels: ['#public']
+    channels: [channel]
   });
 
   proxy.addListener('message', function (from, to, msg) {
