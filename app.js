@@ -66,7 +66,7 @@ function connect(client, sessionId, nickname, channel) {
   clients[sessionId] = { name: nickname };
   var proxy = new irc.Client('irc.gatewayy.net', nickname, {
     port: 6697, secure: true,
-    debug: true, showErrors: true,
+    debug: false, showErrors: true,
     channels: [channel]
   });
 
