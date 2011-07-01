@@ -12,6 +12,7 @@ html, body, input {
 }
 
 #chat-input {
+	background-color: #efefef;
   padding: 10px;
   border-bottom: 1px solid #ddd;
 }
@@ -24,9 +25,9 @@ html, body, input {
   min-height: 100px;
   padding: 10px;
   background: #fcfcfc;
-  background: -webkit-gradient(linear, left top, left bottom, from(#fcfcfc), to(#efefef));
-  background: -moz-linear-gradient(top, #fcfcfc, #efefef);
-  background: linear-gradient(top, #fcfcfc, #efefef);
+  background: -webkit-gradient(linear, left top, left bottom, from(#efefef), to(#fcfcfc));
+  background: -moz-linear-gradient(top, #efefef, #fcfcfc);
+  background: linear-gradient(top, #efefef, #fcfcfc);
   color: #373737;
   text-shadow: 0 1px 1px #ffffff;
 }
@@ -34,26 +35,24 @@ html, body, input {
 #chat-console p {
   margin: 0;
   padding: 4px 4px;
-  
-  border-bottom: 1px solid #cdcdcc;
-  -moz-box-shadow: 0 1px 1px #fcfcfc;
-  -webkit-box-shadow: 0 1px 1px #fcfcfc;
-  box-shadow: 0 1px 1px #fcfcfc;
+  border-bottom: 1px dotted rgba(205, 205, 204, 0.5);
 }
 
 #chat-console span.sender {
   width: 90px;
+  display: inline-block;
+   
   text-overflow: ellipsis;
   padding-right: 2px;
+  font-weight: bold;
 }
 
 #chat-console span.message {
   padding-left: 2px;
-  border-left: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 #chat-console p:last-child {
-  border-bottom: 0px solid #cdcdcc;
+  border-bottom: 0px solid rgba(205, 205, 204, 0.5);
 }
 
 #dashboard {
