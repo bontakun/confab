@@ -95,10 +95,12 @@ html, body, input {
 
 <div id="dashboard"></div>
 <div id="loginBox">
-  Login to Confab
-  <input id="name" type="text" placeholder="name" />
-  <input id="room" type="text" placeholder="roomname" value="#botwars" />
-  <input id="login" type="button" value="Login"/>
+	<form id="loginForm">
+  	Login to Confab
+  	<input id="name" type="text" placeholder="name" />
+  	<input id="room" type="text" placeholder="roomname" value="#botwars" />
+  	<input id="login" type="submit" value="Login"/>
+  </form>
 </div>
 
 <div id="chat-container">
@@ -115,8 +117,9 @@ html, body, input {
   var socket = io.connect();
   var container = $('#chat-console');
 
-  $('#login').click(function(e) {
+  $('#loginForm').submit(function(e) {
     if(global.connected) {
+    	e.preventDefault();
       global.name = $('#name').val();
       global.channel = $('#room').val();
       

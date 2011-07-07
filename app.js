@@ -52,7 +52,8 @@ socket.sockets.on('connection', function(client) {
       
     } else if (!message.connect) {
       if (clients[client.id])
-        clients[client.id].proxy.say('#public', message);
+        clients[client.id].proxy.say(
+        		clients[client.id].currentChannel, message);
     }
   });
 
@@ -74,6 +75,7 @@ function connect(client, sessionId, nickname, channel) {
     client.json.send({ name: from, message: msg });
   });
   clients[sessionId].proxy = proxy;
+  clients[sessionId].currentChannel = channel;
 }
 
 function disconnect(client, sessionId) {
